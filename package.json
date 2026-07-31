@@ -1,0 +1,568 @@
+{
+  "name": "lucid-reader",
+  "displayName": "Lucid Reader",
+  "description": "A typography-first, distraction-free reading view for Markdown. Not a preview.",
+  "version": "0.1.1",
+  "publisher": "luis",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other", "Visualization"],
+  "keywords": ["markdown", "reader", "reading", "focus", "typography", "dyslexia", "bionic", "zen"],
+  "main": "./out/extension.js",
+  "activationEvents": [],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true,
+      "description": "Lucid renders Markdown locally and never executes document content."
+    }
+  },
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "lucid.reader",
+        "displayName": "Lucid Reader",
+        "selector": [
+          { "filenamePattern": "*.md" },
+          { "filenamePattern": "*.markdown" },
+          { "filenamePattern": "*.mdx" },
+          { "filenamePattern": "*.mdown" },
+          { "filenamePattern": "*.mkd" }
+        ],
+        "priority": "option"
+      }
+    ],
+    "commands": [
+      { "command": "lucid.open", "title": "Open in Lucid Reader", "category": "Lucid", "icon": "$(book)" },
+      { "command": "lucid.openToSide", "title": "Open in Lucid Reader (Side)", "category": "Lucid", "icon": "$(book)" },
+      { "command": "lucid.editSource", "title": "Edit Source at Reading Position", "category": "Lucid" },
+      { "command": "lucid.toggleFocusMode", "title": "Cycle Focus Mode", "category": "Lucid" },
+      { "command": "lucid.toggleBionic", "title": "Toggle Bionic Reading", "category": "Lucid" },
+      { "command": "lucid.toggleRuler", "title": "Cycle Reading Ruler", "category": "Lucid" },
+      { "command": "lucid.cycleTheme", "title": "Cycle Reading Theme", "category": "Lucid" },
+      { "command": "lucid.cycleFont", "title": "Cycle Font Preset", "category": "Lucid" },
+      { "command": "lucid.increaseFontSize", "title": "Increase Font Size", "category": "Lucid" },
+      { "command": "lucid.decreaseFontSize", "title": "Decrease Font Size", "category": "Lucid" },
+      { "command": "lucid.resetFontSize", "title": "Reset Font Size", "category": "Lucid" },
+      { "command": "lucid.increaseMeasure", "title": "Widen Line Length", "category": "Lucid" },
+      { "command": "lucid.decreaseMeasure", "title": "Narrow Line Length", "category": "Lucid" },
+      { "command": "lucid.increaseLineHeight", "title": "Increase Line Height", "category": "Lucid" },
+      { "command": "lucid.decreaseLineHeight", "title": "Decrease Line Height", "category": "Lucid" },
+      { "command": "lucid.toggleToc", "title": "Toggle Table of Contents", "category": "Lucid" },
+      { "command": "lucid.toggleAutoScroll", "title": "Toggle Auto Scroll", "category": "Lucid" },
+      { "command": "lucid.find", "title": "Find in Document", "category": "Lucid" },
+      { "command": "lucid.openSettings", "title": "Open Reader Settings", "category": "Lucid" },
+      { "command": "lucid.resetSettings", "title": "Reset All Reader Settings", "category": "Lucid" }
+    ],
+    "keybindings": [
+      {
+        "command": "lucid.open",
+        "key": "ctrl+k r",
+        "mac": "cmd+k r",
+        "when": "editorLangId == markdown || resourceExtname == .md"
+      },
+      {
+        "command": "lucid.openToSide",
+        "key": "ctrl+k shift+r",
+        "mac": "cmd+k shift+r",
+        "when": "editorLangId == markdown || resourceExtname == .md"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "lucid.open",
+          "when": "resourceLangId == markdown && activeCustomEditorId != lucid.reader",
+          "group": "navigation@-1"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "lucid.open",
+          "when": "resourceExtname =~ /\\.(md|markdown|mdx|mdown|mkd)$/",
+          "group": "navigation@10"
+        }
+      ],
+      "commandPalette": [
+        { "command": "lucid.editSource", "when": "activeCustomEditorId == lucid.reader" },
+        { "command": "lucid.find", "when": "activeCustomEditorId == lucid.reader" },
+        { "command": "lucid.toggleAutoScroll", "when": "activeCustomEditorId == lucid.reader" }
+      ]
+    },
+    "configuration": [
+      {
+        "title": "Lucid: Typography",
+        "order": 1,
+        "properties": {
+          "lucid.typography.fontPreset": {
+            "type": "string",
+            "enum": ["serif", "sans", "humanist", "hyperlegible", "dyslexic", "mono", "editor", "custom"],
+            "enumDescriptions": [
+              "Old-style serif stack (Iowan, Charter, Georgia). Best for long prose.",
+              "Neutral grotesque (Inter, Segoe UI, Roboto).",
+              "Humanist sans with open apertures (Seravek, Gill Sans Nova, Calibri).",
+              "Atkinson Hyperlegible if installed. Designed for low vision.",
+              "OpenDyslexic if installed, otherwise a heavy-bottom fallback.",
+              "Monospaced. Some readers find fixed rhythm calming.",
+              "Reuse your VS Code editor font.",
+              "Use lucid.typography.customFontFamily."
+            ],
+            "default": "serif",
+            "markdownDescription": "Body font stack. Font files are **not** bundled; presets fall back to whatever is installed on your system."
+          },
+          "lucid.typography.customFontFamily": {
+            "type": "string",
+            "default": "",
+            "description": "CSS font-family list used when fontPreset is 'custom'. Example: \"Literata\", Georgia, serif"
+          },
+          "lucid.typography.headingFontFamily": {
+            "type": "string",
+            "default": "",
+            "description": "Optional separate font stack for headings. Empty inherits the body font."
+          },
+          "lucid.typography.codeFontFamily": {
+            "type": "string",
+            "default": "",
+            "description": "Optional font stack for code. Empty uses the VS Code editor font."
+          },
+          "lucid.typography.fontSize": {
+            "type": "number",
+            "default": 19,
+            "minimum": 10,
+            "maximum": 48,
+            "description": "Body text size in pixels."
+          },
+          "lucid.typography.fontWeight": {
+            "type": "number",
+            "default": 400,
+            "minimum": 100,
+            "maximum": 800,
+            "description": "Body text weight. 380 can improve perceived contrast on dark themes."
+          },
+          "lucid.typography.lineHeight": {
+            "type": "number",
+            "default": 1.7,
+            "minimum": 1,
+            "maximum": 3,
+            "description": "Line height multiple. 1.6 to 1.8 suits most prose."
+          },
+          "lucid.typography.measure": {
+            "type": "number",
+            "default": 68,
+            "minimum": 30,
+            "maximum": 140,
+            "markdownDescription": "Line length in characters (the *measure*). Research favours 55 to 75 for sustained reading."
+          },
+          "lucid.typography.letterSpacing": {
+            "type": "number",
+            "default": 0,
+            "minimum": -0.05,
+            "maximum": 0.25,
+            "description": "Letter spacing in em. Small positive values (0.01 to 0.04) can help dyslexic readers."
+          },
+          "lucid.typography.wordSpacing": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Extra word spacing in em."
+          },
+          "lucid.typography.paragraphSpacing": {
+            "type": "number",
+            "default": 1.1,
+            "minimum": 0,
+            "maximum": 4,
+            "description": "Vertical gap between paragraphs, in em."
+          },
+          "lucid.typography.paragraphIndent": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "maximum": 6,
+            "description": "First-line indent in em, book style. When above 0, the gap between paragraphs collapses."
+          },
+          "lucid.typography.textAlign": {
+            "type": "string",
+            "enum": ["left", "justify"],
+            "default": "left",
+            "description": "Justified text looks tidy but creates rivers without hyphenation. Enable hyphens with it."
+          },
+          "lucid.typography.hyphens": {
+            "type": "boolean",
+            "default": false,
+            "description": "Automatic hyphenation. Recommended when textAlign is 'justify'."
+          },
+          "lucid.typography.headingScale": {
+            "type": "number",
+            "default": 1,
+            "minimum": 0.6,
+            "maximum": 2,
+            "description": "Multiplier applied to all heading sizes. Lower values calm down heading-heavy documents."
+          },
+          "lucid.typography.balanceHeadings": {
+            "type": "boolean",
+            "default": true,
+            "description": "Balance multi-line headings so lines are of even length."
+          },
+          "lucid.typography.prettyWrap": {
+            "type": "boolean",
+            "default": true,
+            "description": "Prevent single-word last lines (widows) in paragraphs."
+          },
+          "lucid.typography.hangingPunctuation": {
+            "type": "boolean",
+            "default": true,
+            "description": "Hang quotes and bullets into the margin for a cleaner left edge."
+          },
+          "lucid.typography.smartQuotes": {
+            "type": "boolean",
+            "default": true,
+            "description": "Render straight quotes as curly quotes, and ... as an ellipsis."
+          },
+          "lucid.typography.smartDashes": {
+            "type": "boolean",
+            "default": false,
+            "description": "Convert -- and --- into en and em dashes."
+          },
+          "lucid.typography.numerals": {
+            "type": "string",
+            "enum": ["lining", "oldstyle", "tabular"],
+            "enumDescriptions": [
+              "Even-height figures. Clearest for documents full of numbers.",
+              "Figures that rise and fall with the lowercase. Elegant in prose, harder to scan.",
+              "Even-height and fixed-width, so columns of numbers line up."
+            ],
+            "default": "lining",
+            "description": "Numeral style, where the font provides alternates."
+          },
+          "lucid.typography.dropCap": {
+            "type": "boolean",
+            "default": false,
+            "description": "Large initial capital on the first paragraph after a top-level heading."
+          }
+        }
+      },
+      {
+        "title": "Lucid: Theme",
+        "order": 2,
+        "properties": {
+          "lucid.theme.name": {
+            "type": "string",
+            "enum": ["auto", "paper", "sepia", "gray", "dim", "dark", "black", "contrast", "custom"],
+            "enumDescriptions": [
+              "Follow the VS Code theme kind (light, dark, or high contrast).",
+              "Warm off-white. Low glare, closest to print.",
+              "Classic e-reader sepia.",
+              "Neutral light gray. Reduces white-page glare.",
+              "Soft dark gray, low contrast. Easiest dark mode for long sessions.",
+              "Standard dark.",
+              "True black for OLED panels.",
+              "Maximum contrast, thicker rules.",
+              "Use lucid.theme.customColors."
+            ],
+            "default": "auto",
+            "description": "Reading colour scheme. Independent of your VS Code theme unless set to 'auto'."
+          },
+          "lucid.theme.customColors": {
+            "type": "object",
+            "default": {},
+            "description": "Colour overrides applied on top of the active theme. Any subset is allowed.",
+            "properties": {
+              "background": { "type": "string" },
+              "surface": { "type": "string" },
+              "text": { "type": "string" },
+              "heading": { "type": "string" },
+              "muted": { "type": "string" },
+              "accent": { "type": "string" },
+              "rule": { "type": "string" },
+              "codeBackground": { "type": "string" },
+              "highlight": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "lucid.theme.textContrast": {
+            "type": "number",
+            "default": 1,
+            "minimum": 0.5,
+            "maximum": 1,
+            "description": "Softens body text toward the background. 1 is full contrast, 0.85 is gentler for long reads."
+          },
+          "lucid.theme.linkStyle": {
+            "type": "string",
+            "enum": ["underline", "subtle", "color", "plain"],
+            "default": "subtle",
+            "description": "How links are marked. 'plain' removes all link styling for maximum calm."
+          },
+          "lucid.theme.headingColor": {
+            "type": "string",
+            "enum": ["text", "accent", "muted"],
+            "default": "text",
+            "description": "Heading colour source. 'text' uses the theme's dedicated heading colour, which is brighter than body text on dark schemes and darker on light ones."
+          },
+          "lucid.theme.codeStyle": {
+            "type": "string",
+            "enum": ["card", "flat", "bordered"],
+            "default": "card",
+            "description": "Visual treatment for fenced code blocks."
+          }
+        }
+      },
+      {
+        "title": "Lucid: Layout",
+        "order": 3,
+        "properties": {
+          "lucid.layout.align": {
+            "type": "string",
+            "enum": ["center", "left"],
+            "default": "center",
+            "description": "Where the text column sits in the window."
+          },
+          "lucid.layout.paddingTop": {
+            "type": "number",
+            "default": 6,
+            "minimum": 0,
+            "maximum": 40,
+            "description": "Space above the document, in rem."
+          },
+          "lucid.layout.paddingBottom": {
+            "type": "number",
+            "default": 50,
+            "minimum": 0,
+            "maximum": 90,
+            "description": "Trailing space in vh. High values let the last paragraph scroll to eye level."
+          },
+          "lucid.layout.toc": {
+            "type": "string",
+            "enum": ["auto", "always", "never"],
+            "default": "auto",
+            "description": "'auto' shows the outline only when the window is wide enough and the document has 3+ headings."
+          },
+          "lucid.layout.tocSide": {
+            "type": "string",
+            "enum": ["left", "right"],
+            "default": "left",
+            "description": "Which side the outline docks to."
+          },
+          "lucid.layout.tocMaxDepth": {
+            "type": "number",
+            "default": 3,
+            "minimum": 1,
+            "maximum": 6,
+            "description": "Deepest heading level shown in the outline."
+          },
+          "lucid.layout.showProgress": {
+            "type": "boolean",
+            "default": true,
+            "description": "Thin progress bar across the top of the window."
+          },
+          "lucid.layout.showHud": {
+            "type": "boolean",
+            "default": true,
+            "description": "Corner readout with progress percentage, time remaining, and word count."
+          },
+          "lucid.layout.stickyHeading": {
+            "type": "boolean",
+            "default": true,
+            "description": "Keep the current section heading pinned at the top while scrolling."
+          },
+          "lucid.layout.showFrontMatter": {
+            "type": "boolean",
+            "default": true,
+            "description": "Render YAML front matter as a metadata card instead of hiding it."
+          },
+          "lucid.layout.codeBlocks": {
+            "type": "string",
+            "enum": ["expanded", "collapsed", "hidden"],
+            "default": "expanded",
+            "description": "'collapsed' folds code behind a one-line summary so prose reads uninterrupted."
+          },
+          "lucid.layout.wrapCode": {
+            "type": "boolean",
+            "default": false,
+            "description": "Soft-wrap long code lines instead of scrolling horizontally."
+          },
+          "lucid.layout.maxImageHeight": {
+            "type": "number",
+            "default": 60,
+            "minimum": 10,
+            "maximum": 100,
+            "description": "Cap image height as a percentage of window height."
+          },
+          "lucid.layout.tableStyle": {
+            "type": "string",
+            "enum": ["lined", "zebra", "minimal"],
+            "default": "lined",
+            "description": "Table rendering style."
+          },
+          "lucid.layout.smoothScroll": {
+            "type": "boolean",
+            "default": true,
+            "description": "Animate scrolling for keyboard navigation and outline jumps."
+          },
+          "lucid.layout.scrollOffset": {
+            "type": "number",
+            "default": 25,
+            "minimum": 0,
+            "maximum": 60,
+            "description": "Where a jump target lands, as a percentage down from the top of the window."
+          }
+        }
+      },
+      {
+        "title": "Lucid: Reading Aids",
+        "order": 4,
+        "properties": {
+          "lucid.reading.focusMode": {
+            "type": "string",
+            "enum": ["off", "paragraph", "sentence", "line"],
+            "default": "off",
+            "description": "Dim everything except the block, sentence, or line you are on."
+          },
+          "lucid.reading.focusFollows": {
+            "type": "string",
+            "enum": ["center", "mouse", "manual"],
+            "default": "center",
+            "enumDescriptions": [
+              "Whatever sits nearest the vertical centre of the window.",
+              "Whatever the pointer is over.",
+              "Only moves with j/k or the arrow keys."
+            ],
+            "description": "What decides the focused element."
+          },
+          "lucid.reading.focusDim": {
+            "type": "number",
+            "default": 0.32,
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Opacity of unfocused text. Lower is a stronger effect."
+          },
+          "lucid.reading.focusBlur": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "maximum": 4,
+            "description": "Blur radius in pixels applied to unfocused text. 0 disables blur."
+          },
+          "lucid.reading.bionic": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Bold the leading fragment of each word to guide saccades. Effectiveness is **contested**; treat it as a personal preference, not a proven gain."
+          },
+          "lucid.reading.bionicStrength": {
+            "type": "number",
+            "default": 0.4,
+            "minimum": 0.2,
+            "maximum": 0.8,
+            "description": "Fraction of each word that gets bolded."
+          },
+          "lucid.reading.bionicOpacity": {
+            "type": "number",
+            "default": 0.62,
+            "minimum": 0.2,
+            "maximum": 1,
+            "description": "Opacity of the unbolded remainder of each word."
+          },
+          "lucid.reading.ruler": {
+            "type": "string",
+            "enum": ["off", "band", "underline", "spotlight"],
+            "default": "off",
+            "enumDescriptions": [
+              "No ruler.",
+              "Translucent band behind the current line.",
+              "Thin rule beneath the current line.",
+              "Dim everything outside a horizontal window."
+            ],
+            "description": "Reading ruler that tracks the pointer or the focus line."
+          },
+          "lucid.reading.rulerHeight": {
+            "type": "number",
+            "default": 1.9,
+            "minimum": 0.5,
+            "maximum": 8,
+            "description": "Ruler height in line heights."
+          },
+          "lucid.reading.rulerOpacity": {
+            "type": "number",
+            "default": 0.1,
+            "minimum": 0.02,
+            "maximum": 0.9,
+            "description": "Ruler strength."
+          },
+          "lucid.reading.autoScrollSpeed": {
+            "type": "number",
+            "default": 28,
+            "minimum": 4,
+            "maximum": 400,
+            "description": "Teleprompter speed in pixels per second."
+          },
+          "lucid.reading.wordsPerMinute": {
+            "type": "number",
+            "default": 220,
+            "minimum": 80,
+            "maximum": 900,
+            "description": "Your reading speed, used for the time-remaining estimate."
+          },
+          "lucid.reading.rememberPosition": {
+            "type": "boolean",
+            "default": true,
+            "description": "Restore the scroll position the next time you open a file."
+          },
+          "lucid.reading.hideCursorWhenIdle": {
+            "type": "boolean",
+            "default": true,
+            "description": "Hide the mouse pointer after two seconds without movement."
+          },
+          "lucid.reading.highlightOnHover": {
+            "type": "boolean",
+            "default": false,
+            "description": "Subtly tint the paragraph under the pointer."
+          }
+        }
+      },
+      {
+        "title": "Lucid: Behaviour",
+        "order": 5,
+        "properties": {
+          "lucid.behavior.persistOverrides": {
+            "type": "string",
+            "enum": ["user", "workspace", "session"],
+            "default": "user",
+            "enumDescriptions": [
+              "Write to your user settings so they apply everywhere.",
+              "Write to the current workspace only.",
+              "Keep changes in memory; nothing is written to settings.json."
+            ],
+            "description": "Where in-reader adjustments (font size, theme, and so on) are saved."
+          },
+          "lucid.behavior.openLinksInReader": {
+            "type": "boolean",
+            "default": true,
+            "description": "Follow links to other Markdown files inside the reader instead of the text editor."
+          },
+          "lucid.behavior.allowRawHtmlTags": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Honour a small allowlist of inert inline HTML tags (`br`, `kbd`, `sub`, `sup`, `mark`, `details`, and similar). Attributes are always stripped. Everything else renders as literal text."
+          },
+          "lucid.behavior.zenMode": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enter VS Code Zen Mode automatically when a reader tab is opened."
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "build": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "npx --yes @vscode/vsce package --no-dependencies",
+    "install-local": "npm run package && code --install-extension lucid-reader-0.1.0.vsix --force"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.4.5"
+  }
+}
