@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Added a per-block Wrap / Unwrap button in the code block caption, next to
+  Copy. It overrides `lucid.layout.wrapCode` for that one block, so a single
+  long line no longer means scrolling sideways or flipping a global setting.
+
 ## 0.1.1
 
 - Fixed: headings were unreadable on every dark theme. `--heading-color` was

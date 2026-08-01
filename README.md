@@ -135,6 +135,10 @@ progress bar, corner readout, sticky heading, front matter card, code block
 display, code wrapping, image height cap, three table styles, smooth scrolling,
 and where jump targets land in the window.
 
+`lucid.layout.wrapCode` sets the default for every code block. Each block also
+carries a Wrap button next to Copy, so you can wrap one long line without
+changing the setting. Per-block choices last for the session.
+
 **Reading aids**: focus mode and what drives it, dim amount, optional blur,
 bionic reading with adjustable strength and contrast, four reading ruler styles,
 ruler height and strength, auto scroll speed, your words-per-minute for the time

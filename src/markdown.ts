@@ -268,6 +268,18 @@ const startsBlock = (line: string): boolean =>
 
 const dataLine = (n: number): string => ` data-line="${n}"`;
 
+/**
+ * Header shared by fenced and indented code blocks. `label` must already be
+ * escaped. The wrap button carries no state here: the webview owns per-block
+ * wrap, because the default comes from `lucid.layout.wrapCode` at read time.
+ */
+const codeCaption = (label: string): string =>
+  `<figcaption><span class="code-lang">${label}</span>` +
+  `<span class="code-actions">` +
+  `<button class="code-wrap" type="button" title="Wrap long lines" aria-pressed="false">Wrap</button>` +
+  `<button class="code-copy" type="button" title="Copy">Copy</button>` +
+  `</span></figcaption>`;
+
 const splitRow = (row: string): string[] => {
   const trimmed = row.trim().replace(/^\|/, '').replace(/\|$/, '');
   const cells: string[] = [];
@@ -336,8 +348,7 @@ const renderBlocks = (lines: string[], ctx: Ctx, offset: number): Block[] => {
       const label = lang ? escapeHtml(lang) : 'text';
       push(
         `<figure class="code" data-lang="${attr(label)}"${dataLine(abs)}>` +
-          `<figcaption><span class="code-lang">${label}</span>` +
-          `<button class="code-copy" type="button" title="Copy">Copy</button></figcaption>` +
+          codeCaption(label) +
           `<pre><code class="language-${attr(label)}">${escapeHtml(body.join('\n'))}\n</code></pre>` +
           `</figure>`,
       );
@@ -558,8 +569,7 @@ const renderBlocks = (lines: string[], ctx: Ctx, offset: number): Block[] => {
       }
       push(
         `<figure class="code" data-lang="text"${dataLine(abs)}>` +
-          `<figcaption><span class="code-lang">text</span>` +
-          `<button class="code-copy" type="button" title="Copy">Copy</button></figcaption>` +
+          codeCaption('text') +
           `<pre><code>${escapeHtml(body.join('\n'))}\n</code></pre></figure>`,
       );
       continue;

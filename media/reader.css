@@ -601,13 +601,30 @@ figure.code pre {
   tab-size: 2;
 }
 
-body[data-wrap-code='on'] figure.code pre {
+/* Wrap has two layers: `lucid.layout.wrapCode` sets the document default, and
+   the caption button writes `data-wrap` on one figure. The default rule opts
+   out of overridden blocks with :not(), so neither layer needs to outrank the
+   other on specificity. */
+body[data-wrap-code='on'] figure.code:not([data-wrap]) pre,
+figure.code[data-wrap='on'] pre {
   white-space: pre-wrap;
   word-break: break-word;
   overflow-x: hidden;
 }
 
-.code-copy {
+figure.code[data-wrap='off'] pre {
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.code-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+}
+
+.code-copy,
+.code-wrap {
   font: inherit;
   background: none;
   border: none;
@@ -615,9 +632,12 @@ body[data-wrap-code='on'] figure.code pre {
   cursor: pointer;
   padding: 0 0.2em;
   letter-spacing: inherit;
+  text-transform: inherit;
 }
 
-.code-copy:hover {
+.code-copy:hover,
+.code-wrap:hover,
+.code-wrap[aria-pressed='true'] {
   color: var(--fg);
 }
 

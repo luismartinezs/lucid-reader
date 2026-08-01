@@ -42,6 +42,7 @@
     pointer: { x: 0, y: 0, active: false },
     findHits: [],
     findIndex: 0,
+    codeWrap: new Map(),
     cursorTimer: 0,
     restorePending: 0,
   };
@@ -275,8 +276,41 @@
     if (state.cfg.reading.bionic) {
       applyBionic(doc, state.cfg.reading.bionicStrength);
     }
+    applyCodeWrap();
     state.blocks = collectBlocks();
     state.focusEl = null;
+  };
+
+  /**
+   * Per-block wrap overrides.
+   *
+   * `lucid.layout.wrapCode` is the document default; the caption button flips
+   * one block against it. Overrides live in `state.codeWrap`, not in the DOM,
+   * because applyTransforms() rebuilds the article from pristine HTML on every
+   * config change - a class on the figure would not survive a font-size nudge.
+   *
+   * Keyed by source line so the choice also survives an edit to the file: only
+   * blocks whose line moved lose their override.
+   */
+  const codeWrapKey = (figure, index) => figure.dataset.line ?? `i${index}`;
+
+  const applyCodeWrap = () => {
+    const fallback = !!state.cfg?.layout.wrapCode;
+    doc.querySelectorAll('figure.code').forEach((figure, index) => {
+      const override = state.codeWrap.get(codeWrapKey(figure, index));
+      if (override === undefined) {
+        delete figure.dataset.wrap;
+      } else {
+        figure.dataset.wrap = override ? 'on' : 'off';
+      }
+      const on = override ?? fallback;
+      const button = figure.querySelector('.code-wrap');
+      if (button) {
+        button.textContent = on ? 'Unwrap' : 'Wrap';
+        button.title = on ? 'Stop wrapping long lines' : 'Wrap long lines';
+        button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      }
+    });
   };
 
   const BLOCK_SELECTOR =
@@ -986,6 +1020,14 @@
 
   document.addEventListener('keydown', onKeyDown);
 
+  /**
+   * One delegated click handler for the whole article. The order of the
+   * branches below is load-bearing, not stylistic: the caption buttons sit
+   * *inside* `figure.code`, so in `codeBlocks: 'collapsed'` mode a Copy or
+   * Wrap click also matches the collapse branch. Each button branch must run
+   * first and return, or pressing Copy would fold the block you just copied.
+   * Any new control added inside a figure needs the same treatment.
+   */
   doc.addEventListener('click', (event) => {
     const copy = event.target.closest('.code-copy');
     if (copy) {
@@ -993,6 +1035,21 @@
       const code = copy.closest('figure.code')?.querySelector('code')?.textContent ?? '';
       vscode.postMessage({ type: 'copy', text: code });
       toast('copied');
+      return;
+    }
+
+    const wrapButton = event.target.closest('.code-wrap');
+    if (wrapButton) {
+      event.preventDefault();
+      const figure = wrapButton.closest('figure.code');
+      if (figure) {
+        const figures = Array.from(doc.querySelectorAll('figure.code'));
+        const key = codeWrapKey(figure, figures.indexOf(figure));
+        const on = state.codeWrap.get(key) ?? !!state.cfg?.layout.wrapCode;
+        state.codeWrap.set(key, !on);
+        applyCodeWrap();
+        toast(on ? 'wrap off' : 'wrap on');
+      }
       return;
     }
 

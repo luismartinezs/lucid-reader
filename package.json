@@ -380,7 +380,7 @@
           "lucid.layout.wrapCode": {
             "type": "boolean",
             "default": false,
-            "description": "Soft-wrap long code lines instead of scrolling horizontally."
+            "description": "Soft-wrap long code lines instead of scrolling horizontally. This is the default; the Wrap button in each code block's caption overrides it for that block."
           },
           "lucid.layout.maxImageHeight": {
             "type": "number",
