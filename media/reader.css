@@ -601,20 +601,12 @@ figure.code pre {
   tab-size: 2;
 }
 
-/* Wrap has two layers: `lucid.layout.wrapCode` sets the document default, and
-   the caption button writes `data-wrap` on one figure. The default rule opts
-   out of overridden blocks with :not(), so neither layer needs to outrank the
-   other on specificity. */
-body[data-wrap-code='on'] figure.code:not([data-wrap]) pre,
-figure.code[data-wrap='on'] pre {
+/* One switch for the whole document: the caption Wrap button writes
+   `lucid.layout.wrapCode`, which lands back here as this body attribute. */
+body[data-wrap-code='on'] figure.code pre {
   white-space: pre-wrap;
   word-break: break-word;
   overflow-x: hidden;
-}
-
-figure.code[data-wrap='off'] pre {
-  white-space: pre;
-  overflow-x: auto;
 }
 
 .code-actions {

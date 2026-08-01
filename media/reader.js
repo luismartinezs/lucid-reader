@@ -42,7 +42,6 @@
     pointer: { x: 0, y: 0, active: false },
     findHits: [],
     findIndex: 0,
-    codeWrap: new Map(),
     cursorTimer: 0,
     restorePending: 0,
   };
@@ -276,41 +275,28 @@
     if (state.cfg.reading.bionic) {
       applyBionic(doc, state.cfg.reading.bionicStrength);
     }
-    applyCodeWrap();
+    syncWrapButtons();
     state.blocks = collectBlocks();
     state.focusEl = null;
   };
 
   /**
-   * Per-block wrap overrides.
+   * The caption Wrap button is a view onto `lucid.layout.wrapCode`, which is a
+   * document-wide setting, not per-block state. Every button therefore shows
+   * the same label, and pressing one goes through setSetting() like any other
+   * control: written to settings.json, broadcast to every open reader in every
+   * window, and picked up by windows opened later.
    *
-   * `lucid.layout.wrapCode` is the document default; the caption button flips
-   * one block against it. Overrides live in `state.codeWrap`, not in the DOM,
-   * because applyTransforms() rebuilds the article from pristine HTML on every
-   * config change - a class on the figure would not survive a font-size nudge.
-   *
-   * Keyed by source line so the choice also survives an edit to the file: only
-   * blocks whose line moved lose their override.
+   * Called after applyTransforms(), because that rebuilds the article from
+   * pristine HTML and hands back freshly parsed buttons with the default label.
    */
-  const codeWrapKey = (figure, index) => figure.dataset.line ?? `i${index}`;
-
-  const applyCodeWrap = () => {
-    const fallback = !!state.cfg?.layout.wrapCode;
-    doc.querySelectorAll('figure.code').forEach((figure, index) => {
-      const override = state.codeWrap.get(codeWrapKey(figure, index));
-      if (override === undefined) {
-        delete figure.dataset.wrap;
-      } else {
-        figure.dataset.wrap = override ? 'on' : 'off';
-      }
-      const on = override ?? fallback;
-      const button = figure.querySelector('.code-wrap');
-      if (button) {
-        button.textContent = on ? 'Unwrap' : 'Wrap';
-        button.title = on ? 'Stop wrapping long lines' : 'Wrap long lines';
-        button.setAttribute('aria-pressed', on ? 'true' : 'false');
-      }
-    });
+  const syncWrapButtons = () => {
+    const on = !!state.cfg?.layout.wrapCode;
+    for (const button of doc.querySelectorAll('.code-wrap')) {
+      button.textContent = on ? 'Unwrap' : 'Wrap';
+      button.title = on ? 'Stop wrapping long code lines' : 'Wrap long code lines';
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
   };
 
   const BLOCK_SELECTOR =
@@ -1038,18 +1024,10 @@
       return;
     }
 
-    const wrapButton = event.target.closest('.code-wrap');
-    if (wrapButton) {
+    if (event.target.closest('.code-wrap')) {
       event.preventDefault();
-      const figure = wrapButton.closest('figure.code');
-      if (figure) {
-        const figures = Array.from(doc.querySelectorAll('figure.code'));
-        const key = codeWrapKey(figure, figures.indexOf(figure));
-        const on = state.codeWrap.get(key) ?? !!state.cfg?.layout.wrapCode;
-        state.codeWrap.set(key, !on);
-        applyCodeWrap();
-        toast(on ? 'wrap off' : 'wrap on');
-      }
+      const on = !!state.cfg?.layout.wrapCode;
+      setSetting('layout.wrapCode', !on, on ? 'code wrap off' : 'code wrap on');
       return;
     }
 

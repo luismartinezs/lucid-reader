@@ -2,9 +2,11 @@
 
 ## Unreleased
 
-- Added a per-block Wrap / Unwrap button in the code block caption, next to
-  Copy. It overrides `lucid.layout.wrapCode` for that one block, so a single
-  long line no longer means scrolling sideways or flipping a global setting.
+- Added a Wrap / Unwrap button in the code block caption, next to Copy. It
+  toggles `lucid.layout.wrapCode` without a trip to the settings UI, so long
+  lines stop scrolling sideways. Like every other in-reader control it writes
+  the setting, which means it applies to every open reader in every window and
+  persists across restarts.
 
 ## 0.1.1
 

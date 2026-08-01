@@ -270,13 +270,14 @@ const dataLine = (n: number): string => ` data-line="${n}"`;
 
 /**
  * Header shared by fenced and indented code blocks. `label` must already be
- * escaped. The wrap button carries no state here: the webview owns per-block
- * wrap, because the default comes from `lucid.layout.wrapCode` at read time.
+ * escaped. The Wrap button ships in its off state and the webview relabels it
+ * on render, because `lucid.layout.wrapCode` is a live setting and this string
+ * is cached HTML.
  */
 const codeCaption = (label: string): string =>
   `<figcaption><span class="code-lang">${label}</span>` +
   `<span class="code-actions">` +
-  `<button class="code-wrap" type="button" title="Wrap long lines" aria-pressed="false">Wrap</button>` +
+  `<button class="code-wrap" type="button" title="Wrap long code lines" aria-pressed="false">Wrap</button>` +
   `<button class="code-copy" type="button" title="Copy">Copy</button>` +
   `</span></figcaption>`;
 

@@ -135,9 +135,10 @@ progress bar, corner readout, sticky heading, front matter card, code block
 display, code wrapping, image height cap, three table styles, smooth scrolling,
 and where jump targets land in the window.
 
-`lucid.layout.wrapCode` sets the default for every code block. Each block also
-carries a Wrap button next to Copy, so you can wrap one long line without
-changing the setting. Per-block choices last for the session.
+The Wrap button next to Copy in each code block caption toggles
+`lucid.layout.wrapCode`. It is one document-wide switch, not a per-block one:
+pressing it wraps every code block, in every open reader, in every window, and
+the choice is written to your settings so it survives a restart.
 
 **Reading aids**: focus mode and what drives it, dim amount, optional blur,
 bionic reading with adjustable strength and contrast, four reading ruler styles,

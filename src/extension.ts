@@ -60,6 +60,17 @@ const renderDocument = (
   };
 };
 
+/**
+ * Push the current settings to every open reader in THIS window.
+ *
+ * Cross-window sync comes free and is worth knowing about before you build
+ * one: an in-reader control writes to settings.json, and every VS Code window
+ * running this extension fires its own onDidChangeConfiguration, which lands
+ * here. So a toggle pressed in one window reaches readers in all of them, and
+ * a window opened later simply reads the same file. The only exception is
+ * `behavior.persistOverrides: 'session'`, where nothing is written and the
+ * change stays in the panel that made it.
+ */
 const broadcastConfig = (): void => {
   for (const entry of live) {
     void entry.panel.webview.postMessage({
