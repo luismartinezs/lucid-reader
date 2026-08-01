@@ -557,8 +557,8 @@
   "scripts": {
     "build": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "npx --yes @vscode/vsce package --no-dependencies",
-    "install-local": "npm run package && code --install-extension lucid-reader-0.1.0.vsix --force"
+    "package": "tsc -p ./ && npx --yes @vscode/vsce package --no-dependencies --allow-missing-repository --out lucid-reader.vsix",
+    "install-local": "npm run package && code --install-extension lucid-reader.vsix --force"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",

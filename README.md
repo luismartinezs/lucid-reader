@@ -183,9 +183,19 @@ not a proven gain.
 ```bash
 bun install
 bun run build          # tsc, output in out/
-bun run package        # produces lucid-reader-0.1.0.vsix
-code --install-extension lucid-reader-0.1.0.vsix --force
+bun install-local      # build, package, install the vsix
 ```
+
+`bun run package` compiles first and always writes `lucid-reader.vsix`. The
+filename is deliberately version-free: `install-local` used to name the vsix it
+installed, which broke silently on every version bump. The `tsc` step is in the
+`package` script rather than a `vscode:prepublish` hook because `vsce` packages
+whatever sits in `out/` without building, so a forgotten compile ships stale
+JavaScript that looks like a working build.
+
+Installing does not affect the running window. Reload it (`Developer: Reload
+Window`) or the old copy stays live, which reads exactly like a change that had
+no effect.
 
 Dev dependencies are TypeScript and the VS Code type definitions. There is no
 bundler: the extension host code compiles to CommonJS, and the webview runtime
