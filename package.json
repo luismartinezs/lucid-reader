@@ -378,6 +378,13 @@
             "default": "left",
             "description": "Which side the outline docks to."
           },
+          "lucid.layout.tocWidth": {
+            "type": "number",
+            "default": 15.5,
+            "minimum": 10,
+            "maximum": 40,
+            "description": "Outline width, in rem. Drag the outline's inner edge to change it; double-click that edge to reset."
+          },
           "lucid.layout.tocMaxDepth": {
             "type": "number",
             "default": 3,

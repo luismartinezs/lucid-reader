@@ -106,6 +106,11 @@
     tabular: 'lining-nums tabular-nums',
   };
 
+  /* Kept in sync with the min/max/default on `lucid.layout.tocWidth` in package.json. */
+  const TOC_MIN_REM = 10;
+  const TOC_MAX_REM = 40;
+  const TOC_DEFAULT_REM = 15.5;
+
   const FALLBACK_CODE_FONT =
     "var(--vscode-editor-font-family, 'SF Mono', Menlo, Consolas, monospace)";
 
@@ -143,7 +148,7 @@
       '--bionic-op': String(r.bionicOpacity),
       '--ruler-h': String(r.rulerHeight),
       '--ruler-op': String(r.rulerOpacity),
-      '--toc-width': '15.5rem',
+      '--toc-width': `${l.tocWidth ?? TOC_DEFAULT_REM}rem`,
       '--scroll-behavior': l.smoothScroll ? 'smooth' : 'auto',
     };
     for (const [key, value] of Object.entries(varMap)) {
@@ -439,6 +444,101 @@
       mode === 'always' ? count > 0 : mode === 'never' ? false : count >= 3 && window.innerWidth >= 960;
     body.classList.toggle('toc-visible', visible);
     body.classList.toggle('toc-right', state.cfg.layout.tocSide === 'right');
+  };
+
+  /**
+   * Drag-to-resize for the outline.
+   *
+   * The drag writes `--toc-width` straight onto <html> so the pane tracks the
+   * pointer at screen rate, and only the pointerup commits through setSetting,
+   * because every commit round-trips to the extension host and back as a config
+   * broadcast. Committing per pointermove would queue one write to settings.json
+   * per frame.
+   *
+   * Widths are stored in rem, not px, so an outline sized at one font size still
+   * holds roughly the same number of outline entries after the reader font size
+   * changes. The px-per-rem factor is read at drag start rather than assumed to
+   * be 16, since the webview inherits the host's root font size.
+   */
+  const wireTocResize = () => {
+    const grip = $('toc-resize');
+    if (!grip) {
+      return;
+    }
+
+    let dragging = false;
+    let remPx = 16;
+    let width = TOC_DEFAULT_REM;
+
+    // The upper bound is whichever is smaller: the setting's own maximum (40rem)
+    // or half the pane, so a wide drag in a narrow pane cannot leave the text
+    // column with less room than the outline.
+    const previewWidth = (rem) => {
+      const paneMax = window.innerWidth / 2 / remPx;
+      width = clamp(rem, TOC_MIN_REM, Math.max(TOC_MIN_REM, Math.min(TOC_MAX_REM, paneMax)));
+      document.documentElement.style.setProperty('--toc-width', `${width}rem`);
+    };
+
+    const commitWidth = (label) => {
+      setSetting('layout.tocWidth', Math.round(width * 100) / 100, label);
+    };
+
+    grip.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0) {
+        return;
+      }
+      event.preventDefault();
+      dragging = true;
+      remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      width = state.cfg.layout.tocWidth ?? TOC_DEFAULT_REM;
+      grip.setPointerCapture(event.pointerId);
+      body.classList.add('toc-resizing');
+    });
+
+    grip.addEventListener('pointermove', (event) => {
+      if (!dragging) {
+        return;
+      }
+      const edge =
+        state.cfg.layout.tocSide === 'right' ? window.innerWidth - event.clientX : event.clientX;
+      previewWidth(edge / remPx);
+    });
+
+    const endDrag = (event) => {
+      if (!dragging) {
+        return;
+      }
+      dragging = false;
+      body.classList.remove('toc-resizing');
+      grip.releasePointerCapture?.(event.pointerId);
+      commitWidth();
+    };
+
+    grip.addEventListener('pointerup', endDrag);
+    grip.addEventListener('pointercancel', endDrag);
+
+    grip.addEventListener('dblclick', (event) => {
+      event.preventDefault();
+      width = TOC_DEFAULT_REM;
+      commitWidth('outline width reset');
+    });
+
+    // Arrow keys give the same control without a pointer. The document-level
+    // handler treats arrows as scrolling, so the event must stop here.
+    grip.addEventListener('keydown', (event) => {
+      const step =
+        event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;
+      if (step === 0) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const towardsWider = state.cfg.layout.tocSide === 'right' ? -step : step;
+      const current = state.cfg.layout.tocWidth ?? TOC_DEFAULT_REM;
+      previewWidth(current + towardsWider * (event.shiftKey ? 0.25 : 1));
+      commitWidth();
+    });
   };
 
   /* ------------------------------------------------- progress, HUD, crumb */
@@ -1131,6 +1231,8 @@
   );
 
   document.addEventListener('keydown', onKeyDown);
+
+  wireTocResize();
 
   /**
    * One delegated click handler for the whole article. The order of the

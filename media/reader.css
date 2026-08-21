@@ -1242,6 +1242,59 @@ body.toc-right #toc {
   border-left: 1px solid color-mix(in srgb, var(--rule) 55%, transparent);
 }
 
+/*
+ * Resize grip for the outline.
+ *
+ * It is a sibling of #toc rather than a child, because #toc scrolls its own
+ * content (`overflow-y: auto`) and an absolutely positioned child would slide
+ * up with that scroll. Fixed positioning off `--toc-width` keeps the grip
+ * pinned to the outline's inner edge on whichever side the outline docks to.
+ */
+#toc-resize {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--toc-width) - 3px);
+  width: 7px;
+  display: none;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 16;
+}
+
+body.toc-visible #toc-resize { display: block; }
+
+body.toc-right #toc-resize {
+  left: auto;
+  right: calc(var(--toc-width) - 3px);
+}
+
+#toc-resize::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 3px;
+  width: 2px;
+  background: transparent;
+  transition: background 0.15s ease;
+}
+
+#toc-resize:hover::after,
+#toc-resize:focus-visible::after,
+body.toc-resizing #toc-resize::after {
+  background: color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+#toc-resize:focus-visible { outline: none; }
+
+/* Drag feedback: no text selection anywhere, and the grip cursor everywhere. */
+body.toc-resizing,
+body.toc-resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
 #toc-head {
   font-size: 0.82em;
   text-transform: uppercase;
@@ -1617,7 +1670,8 @@ mark.find-hit.current {
     padding-left: 0;
     padding-right: 0;
   }
-  #toc { display: none !important; }
+  #toc,
+  #toc-resize { display: none !important; }
   #doc { padding-left: 1.4rem; padding-right: 1.4rem; }
 }
 

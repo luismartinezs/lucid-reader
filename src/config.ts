@@ -146,6 +146,7 @@ export const readConfig = (scope?: vscode.Uri) => {
       paddingBottom: clamp(c.get('layout.paddingBottom'), 0, 90, 50),
       toc: pick(c.get('layout.toc'), ['auto', 'always', 'never'] as const, 'auto'),
       tocSide: pick(c.get('layout.tocSide'), ['left', 'right'] as const, 'left'),
+      tocWidth: clamp(c.get('layout.tocWidth'), 10, 40, 15.5),
       tocMaxDepth: clamp(c.get('layout.tocMaxDepth'), 1, 6, 3),
       showProgress: bool(c.get('layout.showProgress'), true),
       showHud: bool(c.get('layout.showHud'), true),

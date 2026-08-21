@@ -77,6 +77,8 @@ export const buildShell = (webview: vscode.Webview, extensionUri: vscode.Uri): s
     <ol id="toc-list"></ol>
   </nav>
 
+  <div id="toc-resize" role="separator" aria-orientation="vertical" aria-label="Resize outline" tabindex="0" title="Drag to resize the outline. Double-click to reset."></div>
+
   <div id="crumb" aria-hidden="true"><span id="crumb-text"></span></div>
 
   <main id="scroller" tabindex="0">
