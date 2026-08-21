@@ -840,6 +840,7 @@
     'ember',
     'plum',
     'black',
+    'contrast-dark',
     'custom',
   ];
 

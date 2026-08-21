@@ -7,6 +7,10 @@
   `midnight`, `ocean`, `forest`, `ember`, `plum`. Every new palette clears the
   same contrast band as the existing ones (body text at or above 9:1 against
   its own background, accent at or above 5.5:1).
+- Added `contrast-dark`, a maximum-contrast dark palette that mirrors
+  `contrast`: pure white on pure black (21:1), `--rule` at full strength so
+  rules and table borders read as hard lines, and secondary chrome brighter
+  than any other dark palette (muted 16.8:1, faint 11.2:1).
 - The theme list is now ordered light to dark, so `t` walks a family before it
   jumps between light and dark.
 - Added a theme picker: `T` in the reader, or the `Lucid: Pick Reading Theme`

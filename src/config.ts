@@ -69,6 +69,7 @@ export const THEMES = [
   'ember',
   'plum',
   'black',
+  'contrast-dark',
   'custom',
 ] as const;
 

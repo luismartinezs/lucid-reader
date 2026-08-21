@@ -342,6 +342,26 @@ body[data-theme='black'],
   --shadow: rgba(0, 0, 0, 0.8);
 }
 
+/* The dark mirror of `contrast`: the same decisions inverted. Pure ground and
+   pure text for the maximum 21:1, `--rule` at full strength rather than a tint
+   so every rule and table border reads as a hard line, and a highlight dark
+   enough that `mark`, which paints `--fg` over `--highlight`, stays legible. */
+body[data-theme='contrast-dark'],
+.sw[data-sw='contrast-dark'] {
+  --bg: #000000;
+  --surface: #121212;
+  --fg: #ffffff;
+  --heading-fg: #ffffff;
+  --muted: #e6e6e6;
+  --faint: #bdbdbd;
+  --accent: #66d9ff;
+  --rule: #ffffff;
+  --code-bg: #121212;
+  --code-fg: #ffffff;
+  --highlight: #6b5200;
+  --shadow: rgba(0, 0, 0, 0.9);
+}
+
 /* 'auto' delegates to the VS Code theme kind, which VS Code stamps on <body>. */
 body[data-theme='auto'] {
   --bg: #fbfaf7;

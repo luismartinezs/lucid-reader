@@ -270,6 +270,7 @@
               "ember",
               "plum",
               "black",
+              "contrast-dark",
               "custom"
             ],
             "enumDescriptions": [
@@ -291,6 +292,7 @@
               "Warm dark brown with an amber accent. The least blue of the dark palettes.",
               "Deep purple with a violet accent.",
               "True black for OLED panels.",
+              "Maximum contrast, dark. Pure white on pure black, thicker rules.",
               "Use lucid.theme.customColors."
             ],
             "default": "auto",

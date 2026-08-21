@@ -103,7 +103,7 @@ have Atkinson Hyperlegible or OpenDyslexic on your system. Use `custom` plus
 `lucid.typography.customFontFamily` for anything else.
 
 **`lucid.theme.name`** (default `auto`)
-`auto` follows your VS Code theme. The other seventeen are independent of it,
+`auto` follows your VS Code theme. The other eighteen are independent of it,
 which is the point: a dark IDE and a sepia reading pane is a perfectly
 reasonable setup.
 
@@ -115,7 +115,8 @@ warm grey, red accent), `gray`, `contrast` (maximum contrast, thicker rules).
 Dark: `dim` (the gentlest for long sessions), `dark`, `midnight` (deep navy),
 `ocean` (dark teal), `forest` (deep green, low blue content), `ember` (warm
 brown, amber accent, the least blue of the dark set), `plum` (deep purple),
-`black` (for OLED panels).
+`black` (for OLED panels), `contrast-dark` (the dark mirror of `contrast`:
+pure white on pure black, full-strength rules).
 
 Press `T` in the reader for a grid of all of them. Arrow keys preview each one
 on the document behind the picker, `Enter` keeps the one you are looking at, and
@@ -141,7 +142,7 @@ hyphenation, a heading scale multiplier, heading balancing, widow prevention,
 hanging punctuation, smart quotes, smart dashes, numeral style (lining,
 oldstyle, or tabular), and drop caps.
 
-**Theme**: eighteen schemes, a `customColors` object that overrides any subset of
+**Theme**: nineteen schemes, a `customColors` object that overrides any subset of
 them (`background`, `surface`, `text`, `heading`, `muted`, `accent`, `rule`,
 `codeBackground`, `highlight`), a text contrast softener, four link styles including one that removes link
 styling entirely, heading colour source, and three code block treatments.
