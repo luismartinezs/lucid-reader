@@ -105,6 +105,14 @@ export const buildShell = (webview: vscode.Webview, extensionUri: vscode.Uri): s
     <button id="find-close" type="button" title="Close (Esc)">✕</button>
   </div>
 
+  <div id="themes" hidden>
+    <div id="themes-card">
+      <h2>Reading theme</h2>
+      <p class="themes-hint">Arrow keys preview, <kbd>Enter</kbd> keeps, <kbd>Esc</kbd> reverts.</p>
+      <div id="themes-grid" role="listbox" aria-label="Reading theme"></div>
+    </div>
+  </div>
+
   <div id="help" hidden>
     <div id="help-card">
       <h2>Reading controls</h2>

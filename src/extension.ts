@@ -420,6 +420,7 @@ export const activate = (context: vscode.ExtensionContext): void => {
     });
   };
   forward('lucid.find', 'find');
+  forward('lucid.pickTheme', 'themes');
   forward('lucid.toggleAutoScroll', 'autoscroll');
   forward('lucid.editSource', 'edit');
 };

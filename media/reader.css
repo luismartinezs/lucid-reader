@@ -55,10 +55,21 @@ body.hide-cursor * {
    These are declared on `body`, never on `:root`, because reader.js resolves
    `var(--fg)` and friends against the element it writes them on. The one
    exception is the `:root` copy of `paper` below, which exists only so the
-   first paint before JS runs is not unstyled. */
+   first paint before JS runs is not unstyled.
+
+   Each palette carries a second selector, `.sw[data-sw='<name>']`, so the
+   swatches in the theme picker can paint themselves from the same declaration
+   block. A swatch is an ordinary element inside `<body>`, so it would
+   otherwise inherit the palette currently in effect and every swatch would
+   look identical. Adding the palette to a picker means adding the name to the
+   `THEMES` list in three files (package.json, src/config.ts, media/reader.js)
+   and nothing else. */
+
+/* ---------------------------------------------------------------- light */
 
 :root,
-body[data-theme='paper'] {
+body[data-theme='paper'],
+.sw[data-sw='paper'] {
   --bg: #fbfaf7;
   --surface: #f2f0ea;
   --fg: #1f2024;
@@ -73,7 +84,8 @@ body[data-theme='paper'] {
   --shadow: rgba(31, 32, 36, 0.08);
 }
 
-body[data-theme='sepia'] {
+body[data-theme='sepia'],
+.sw[data-sw='sepia'] {
   --bg: #f4ecd8;
   --surface: #ece2c9;
   --fg: #423628;
@@ -88,7 +100,88 @@ body[data-theme='sepia'] {
   --shadow: rgba(75, 63, 48, 0.1);
 }
 
-body[data-theme='gray'] {
+body[data-theme='parchment'],
+.sw[data-sw='parchment'] {
+  --bg: #efe9db;
+  --surface: #e5dece;
+  --fg: #33302a;
+  --heading-fg: #201e19;
+  --muted: #615b4e;
+  --faint: #8a8376;
+  --accent: #6b5524;
+  --rule: #d3cab3;
+  --code-bg: #e5dece;
+  --code-fg: #3a362e;
+  --highlight: #ecd68d;
+  --shadow: rgba(58, 54, 44, 0.1);
+}
+
+body[data-theme='dawn'],
+.sw[data-sw='dawn'] {
+  --bg: #faf4ed;
+  --surface: #f2e9e1;
+  --fg: #443d59;
+  --heading-fg: #2f2942;
+  --muted: #6a6280;
+  --faint: #948da3;
+  --accent: #a83359;
+  --rule: #e4d8d0;
+  --code-bg: #f2e9e1;
+  --code-fg: #443d59;
+  --highlight: #f6d3b0;
+  --shadow: rgba(68, 61, 89, 0.11);
+}
+
+body[data-theme='sage'],
+.sw[data-sw='sage'] {
+  --bg: #edf0e8;
+  --surface: #e2e7da;
+  --fg: #232a22;
+  --heading-fg: #131a13;
+  --muted: #545e51;
+  --faint: #7c8777;
+  --accent: #365f40;
+  --rule: #ccd4c3;
+  --code-bg: #e2e7da;
+  --code-fg: #283027;
+  --highlight: #dcea9a;
+  --shadow: rgba(35, 42, 34, 0.09);
+}
+
+body[data-theme='mist'],
+.sw[data-sw='mist'] {
+  --bg: #eef2f6;
+  --surface: #e1e7ee;
+  --fg: #1d242c;
+  --heading-fg: #0d131a;
+  --muted: #4e5a66;
+  --faint: #7a8693;
+  --accent: #235a80;
+  --rule: #cbd5e0;
+  --code-bg: #e1e7ee;
+  --code-fg: #232b34;
+  --highlight: #f7e08d;
+  --shadow: rgba(29, 36, 44, 0.1);
+}
+
+body[data-theme='newsprint'],
+.sw[data-sw='newsprint'] {
+  --bg: #e9e6df;
+  --surface: #dedad1;
+  --fg: #191811;
+  --heading-fg: #0b0a06;
+  --muted: #4d4a41;
+  --faint: #78746a;
+  --accent: #8f2f2a;
+  --rule: #c7c2b6;
+  --code-bg: #dedad1;
+  --code-fg: #201e17;
+  --highlight: #efdc93;
+  --shadow: rgba(25, 24, 17, 0.12);
+}
+
+body[data-theme='gray'],
+.sw[data-sw='gray'] {
   --bg: #e8e8e6;
   --surface: #dededa;
   --fg: #202126;
@@ -103,7 +196,26 @@ body[data-theme='gray'] {
   --shadow: rgba(38, 39, 43, 0.09);
 }
 
-body[data-theme='dim'] {
+body[data-theme='contrast'],
+.sw[data-sw='contrast'] {
+  --bg: #ffffff;
+  --surface: #f0f0f0;
+  --fg: #000000;
+  --heading-fg: #000000;
+  --muted: #2b2b2b;
+  --faint: #4d4d4d;
+  --accent: #0033cc;
+  --rule: #000000;
+  --code-bg: #f0f0f0;
+  --code-fg: #000000;
+  --highlight: #ffec3d;
+  --shadow: rgba(0, 0, 0, 0.25);
+}
+
+/* ----------------------------------------------------------------- dark */
+
+body[data-theme='dim'],
+.sw[data-sw='dim'] {
   --bg: #24262b;
   --surface: #2d3037;
   --fg: #dcdee4;
@@ -118,7 +230,8 @@ body[data-theme='dim'] {
   --shadow: rgba(0, 0, 0, 0.35);
 }
 
-body[data-theme='dark'] {
+body[data-theme='dark'],
+.sw[data-sw='dark'] {
   --bg: #16181c;
   --surface: #1f2228;
   --fg: #dfe2e8;
@@ -133,7 +246,88 @@ body[data-theme='dark'] {
   --shadow: rgba(0, 0, 0, 0.5);
 }
 
-body[data-theme='black'] {
+body[data-theme='midnight'],
+.sw[data-sw='midnight'] {
+  --bg: #0d1220;
+  --surface: #151d31;
+  --fg: #ccd6ea;
+  --heading-fg: #eaf1ff;
+  --muted: #94a2bf;
+  --faint: #6d7b9d;
+  --accent: #85aaf2;
+  --rule: #26314b;
+  --code-bg: #121a2c;
+  --code-fg: #ccd6ea;
+  --highlight: #3a4a86;
+  --shadow: rgba(0, 0, 0, 0.55);
+}
+
+body[data-theme='ocean'],
+.sw[data-sw='ocean'] {
+  --bg: #08262c;
+  --surface: #0e343c;
+  --fg: #c1d8d8;
+  --heading-fg: #e4f2f0;
+  --muted: #8dabab;
+  --faint: #688686;
+  --accent: #4fc3b1;
+  --rule: #17454e;
+  --code-bg: #0b2d34;
+  --code-fg: #c1d8d8;
+  --highlight: #35604f;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
+body[data-theme='forest'],
+.sw[data-sw='forest'] {
+  --bg: #0f1712;
+  --surface: #17221a;
+  --fg: #ccd8c8;
+  --heading-fg: #e9f3e4;
+  --muted: #96a691;
+  --faint: #6e7f6b;
+  --accent: #8bc27f;
+  --rule: #26362a;
+  --code-bg: #131c16;
+  --code-fg: #ccd8c8;
+  --highlight: #47521f;
+  --shadow: rgba(0, 0, 0, 0.55);
+}
+
+body[data-theme='ember'],
+.sw[data-sw='ember'] {
+  --bg: #1b1815;
+  --surface: #262220;
+  --fg: #e3d6c3;
+  --heading-fg: #f8efe0;
+  --muted: #ab9c89;
+  --faint: #817566;
+  --accent: #dd9440;
+  --rule: #38312b;
+  --code-bg: #201c19;
+  --code-fg: #e3d6c3;
+  --highlight: #5c4520;
+  --shadow: rgba(0, 0, 0, 0.55);
+}
+
+body[data-theme='plum'],
+.sw[data-sw='plum'] {
+  --bg: #17121f;
+  --surface: #211a2c;
+  --fg: #d9cfe6;
+  --heading-fg: #f2ebfa;
+  --muted: #a597b8;
+  --faint: #7d708f;
+  --accent: #c48ce0;
+  --rule: #322842;
+  --code-bg: #1c1626;
+  --code-fg: #d9cfe6;
+  --highlight: #4d3266;
+  --shadow: rgba(0, 0, 0, 0.55);
+}
+
+body[data-theme='black'],
+.sw[data-sw='black'] {
   --bg: #000000;
   --surface: #0e0f12;
   --fg: #d4d6dc;
@@ -146,21 +340,6 @@ body[data-theme='black'] {
   --code-fg: #d4d6dc;
   --highlight: #48411c;
   --shadow: rgba(0, 0, 0, 0.8);
-}
-
-body[data-theme='contrast'] {
-  --bg: #ffffff;
-  --surface: #f0f0f0;
-  --fg: #000000;
-  --heading-fg: #000000;
-  --muted: #2b2b2b;
-  --faint: #4d4d4d;
-  --accent: #0033cc;
-  --rule: #000000;
-  --code-bg: #f0f0f0;
-  --code-fg: #000000;
-  --highlight: #ffec3d;
-  --shadow: rgba(0, 0, 0, 0.25);
 }
 
 /* 'auto' delegates to the VS Code theme kind, which VS Code stamps on <body>. */
@@ -223,7 +402,6 @@ body[data-theme='auto'].vscode-high-contrast-light {
   --highlight: #ffec3d;
   --shadow: rgba(0, 0, 0, 0.25);
 }
-
 /* ------------------------------------------------------------- scroll host */
 
 #scroller {
@@ -1275,6 +1453,115 @@ mark.find-hit.current {
   padding: 0.45em 1.1em;
   cursor: pointer;
 }
+
+/* ------------------------------------------------------------ theme picker */
+
+/* The picker exists because the palette list outgrew the `t` cycle: stepping
+   through 19 entries to reach the one you want is worse than looking at them.
+   Each swatch paints itself from the palette's own declaration block via the
+   `.sw[data-sw='<name>']` selector listed beside every `body[data-theme=...]`
+   rule near the top of this file. */
+
+#themes {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  z-index: 50;
+}
+
+#themes[hidden] { display: none; }
+
+#themes-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 0.7em;
+  padding: 1.6em 1.9em 1.9em;
+  width: min(94vw, 46rem);
+  max-height: 84vh;
+  overflow-y: auto;
+  box-shadow: 0 18px 50px var(--shadow);
+  font-size: 0.85rem;
+}
+
+#themes-card h2 {
+  margin: 0 0 0.35em;
+  font-size: 1.1rem;
+}
+
+.themes-hint {
+  margin: 0 0 1.3em;
+  color: var(--faint);
+  font-size: 0.9em;
+}
+
+#themes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.7em;
+}
+
+.sw {
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  padding: 0.65em 0.75em 0.7em;
+  border-radius: 0.5em;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  color: var(--fg);
+  outline-offset: 2px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.sw:hover { transform: translateY(-1px); }
+
+.sw:focus-visible {
+  outline: 2px solid var(--accent);
+}
+
+/* The selection ring uses `currentColor`, which is the swatch's own `--fg`.
+   An accent colour would vanish on the palettes whose accent is quiet, but
+   every palette guarantees its text reads against its own background. */
+.sw.current {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px currentColor;
+}
+
+.sw-name {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  font-size: 0.92em;
+  letter-spacing: 0.01em;
+  color: var(--heading-fg);
+}
+
+.sw-dot {
+  width: 0.6em;
+  height: 0.6em;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+
+.sw-lines {
+  display: grid;
+  gap: 0.28em;
+  margin-top: 0.6em;
+}
+
+.sw-lines i {
+  display: block;
+  height: 0.28em;
+  border-radius: 0.14em;
+  background: currentColor;
+}
+
+.sw-lines i:nth-child(1) { width: 100%; opacity: 0.5; }
+.sw-lines i:nth-child(2) { width: 86%; opacity: 0.5; }
+.sw-lines i:nth-child(3) { width: 58%; opacity: 0.28; }
 
 /* -------------------------------------------------------------------- toast */
 

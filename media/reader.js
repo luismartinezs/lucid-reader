@@ -22,6 +22,23 @@
   const vscode = acquireVsCodeApi();
 
   const $ = (id) => document.getElementById(id);
+
+  /**
+   * Attaches a listener only if the element exists.
+   *
+   * The webview HTML and this script are two files that can disagree. VS Code
+   * builds the HTML in the extension host, which keeps the previously loaded
+   * copy of out/webview.js until the window is reloaded, while the webview
+   * fetches media/reader.js from disk on every open. Reinstalling in place
+   * therefore pairs an old shell with a new script, and an element added in
+   * the same change is missing. Before this helper, that threw during startup
+   * wiring, which runs above the `ready` post, so the extension never sent the
+   * document and the reader showed an empty background.
+   */
+  const on = (id, type, handler) => {
+    $(id)?.addEventListener(type, handler);
+  };
+
   const body = document.body;
   const scroller = $('scroller');
   const doc = $('doc');
@@ -769,6 +786,7 @@
     ['{ / }', 'Tighter / looser line height'],
     ['y', 'Cycle font preset'],
     ['t', 'Cycle theme'],
+    ['T', 'Theme picker'],
     ['Read', ''],
     ['f', 'Cycle focus mode'],
     ['b', 'Toggle bionic reading'],
@@ -797,9 +815,102 @@
     help.hidden = !help.hidden;
   };
 
+  /* ---------------------------------------------------------- theme picker */
+
+  /* Must stay in the same order as `THEMES` in src/config.ts, because `t`
+     cycles this list in the webview and the `lucid.cycleTheme` command cycles
+     that one, and the two would disagree about what comes next. Light
+     palettes first, then dark, so a cycle walks a family before it jumps. */
+  const THEMES = [
+    'auto',
+    'paper',
+    'sepia',
+    'parchment',
+    'dawn',
+    'sage',
+    'mist',
+    'newsprint',
+    'gray',
+    'contrast',
+    'dim',
+    'dark',
+    'midnight',
+    'ocean',
+    'forest',
+    'ember',
+    'plum',
+    'black',
+    'custom',
+  ];
+
+  /* Preview writes `body.dataset.theme` directly instead of going through
+     setSetting, so that arrowing across 19 palettes does not write 19 times to
+     settings.json. `themePicker.saved` holds the palette to restore on Esc. */
+  const themePicker = { saved: null };
+
+  const buildThemes = () => {
+    const grid = $('themes-grid');
+    if (!grid) {
+      return;
+    }
+    grid.innerHTML = THEMES.map(
+      (name) =>
+        `<button class="sw" type="button" role="option" aria-selected="false" data-sw="${name}">` +
+        `<span class="sw-name"><span class="sw-dot"></span>${name}</span>` +
+        `<span class="sw-lines"><i></i><i></i><i></i></span>` +
+        `</button>`,
+    ).join('');
+  };
+
+  const previewTheme = (name) => {
+    body.dataset.theme = name;
+    for (const sw of $('themes-grid')?.children ?? []) {
+      const on = sw.dataset.sw === name;
+      sw.classList.toggle('current', on);
+      sw.setAttribute('aria-selected', on ? 'true' : 'false');
+    }
+  };
+
+  const openThemes = () => {
+    if (!state.cfg || !$('themes')) {
+      return;
+    }
+    themePicker.saved = state.cfg.theme.name;
+    $('themes').hidden = false;
+    previewTheme(themePicker.saved);
+    const current = $('themes-grid').querySelector('.sw.current') ?? $('themes-grid').firstElementChild;
+    current?.focus();
+  };
+
+  /** `keep` commits the previewed palette; otherwise the entry palette returns. */
+  const closeThemes = (keep) => {
+    if ($('themes')?.hidden !== false) {
+      return;
+    }
+    const shown = body.dataset.theme;
+    $('themes').hidden = true;
+    if (keep && shown !== themePicker.saved) {
+      setSetting('theme.name', shown, `theme ${shown}`);
+    } else {
+      body.dataset.theme = themePicker.saved;
+    }
+    themePicker.saved = null;
+    scroller.focus();
+  };
+
+  const stepThemeFocus = (step) => {
+    const swatches = [...($('themes-grid')?.children ?? [])];
+    if (swatches.length === 0) {
+      return;
+    }
+    const at = swatches.findIndex((sw) => sw === document.activeElement);
+    const next = swatches[(at < 0 ? 0 : at + step + swatches.length) % swatches.length];
+    next.focus();
+    previewTheme(next.dataset.sw);
+  };
+
   /* -------------------------------------------------------------- keyboard */
 
-  const THEMES = ['auto', 'paper', 'sepia', 'gray', 'dim', 'dark', 'black', 'contrast', 'custom'];
   const FONTS = ['serif', 'sans', 'humanist', 'hyperlegible', 'dyslexic', 'mono', 'editor', 'custom'];
   const FOCUS = ['off', 'paragraph', 'sentence', 'line'];
   const RULERS = ['off', 'band', 'underline', 'spotlight'];
@@ -807,6 +918,19 @@
 
   const onKeyDown = (event) => {
     if (event.target.tagName === 'INPUT') {
+      return;
+    }
+    // While the theme picker is open it owns the keyboard. Its own handler on
+    // #themes runs first for keys pressed with a swatch focused, but keydown
+    // still bubbles to this listener, and without the guard an arrow key would
+    // both move the selection and scroll the document behind the overlay.
+    // Escape stays here as well, for the case where a backdrop click moved
+    // focus out of the grid.
+    if ($('themes')?.hidden === false) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeThemes(false);
+      }
       return;
     }
     if (event.ctrlKey || event.metaKey || event.altKey) {
@@ -876,6 +1000,7 @@
         setSetting('theme.name', next, `theme ${next}`);
         break;
       }
+      case 'T': openThemes(); break;
       case 'y': {
         const next = cycleValue(FONTS, t.fontPreset);
         setSetting('typography.fontPreset', next, `font ${next}`);
@@ -1060,7 +1185,7 @@
     vscode.postMessage({ type: 'link', href });
   });
 
-  $('toc-list').addEventListener('click', (event) => {
+  on('toc-list', 'click', (event) => {
     const link = event.target.closest('a');
     if (!link) {
       return;
@@ -1069,8 +1194,8 @@
     scrollToElement(document.getElementById(link.dataset.slug));
   });
 
-  $('find-input').addEventListener('input', (event) => runFind(event.target.value));
-  $('find-input').addEventListener('keydown', (event) => {
+  on('find-input', 'input', (event) => runFind(event.target.value));
+  on('find-input', 'keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
       gotoHit(state.findIndex + (event.shiftKey ? -1 : 1));
@@ -1079,12 +1204,46 @@
       closeFind();
     }
   });
-  $('find-next').addEventListener('click', () => gotoHit(state.findIndex + 1));
-  $('find-prev').addEventListener('click', () => gotoHit(state.findIndex - 1));
-  $('find-close').addEventListener('click', closeFind);
-  $('hud-help').addEventListener('click', toggleHelp);
-  $('help-close').addEventListener('click', toggleHelp);
-  $('help').addEventListener('click', (event) => {
+  on('find-next', 'click', () => gotoHit(state.findIndex + 1));
+  on('find-prev', 'click', () => gotoHit(state.findIndex - 1));
+  on('find-close', 'click', closeFind);
+  on('themes-grid', 'click', (event) => {
+    const sw = event.target.closest('.sw');
+    if (sw) {
+      previewTheme(sw.dataset.sw);
+      closeThemes(true);
+    }
+  });
+
+  /* The picker keeps focus inside itself, so its keys are handled here rather
+     than in onKeyDown, which returns early for anything but the scroller. */
+  on('themes', 'keydown', (event) => {
+    const columns = Math.max(
+      1,
+      Math.round($('themes-grid').clientWidth / ($('themes-grid').firstElementChild?.offsetWidth || 1)),
+    );
+    const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: columns, ArrowUp: -columns }[event.key];
+    if (step) {
+      event.preventDefault();
+      stepThemeFocus(step);
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      closeThemes(true);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      closeThemes(false);
+    }
+  });
+
+  on('themes', 'click', (event) => {
+    if (event.target.id === 'themes') {
+      closeThemes(false);
+    }
+  });
+
+  on('hud-help', 'click', toggleHelp);
+  on('help-close', 'click', toggleHelp);
+  on('help', 'click', (event) => {
     if (event.target.id === 'help') {
       toggleHelp();
     }
@@ -1109,6 +1268,8 @@
       case 'action':
         if (msg.action === 'find') {
           openFind();
+        } else if (msg.action === 'themes') {
+          openThemes();
         } else if (msg.action === 'autoscroll') {
           toggleAutoScroll();
         } else if (msg.action === 'edit') {
@@ -1120,7 +1281,15 @@
     }
   });
 
-  buildHelp();
-  scroller.focus();
+  /* `ready` is the handshake that makes the extension send the document, so it
+     has to survive a failure in anything above it. Chrome that never got built
+     is a missing overlay; a document that never arrives is a blank window. */
+  try {
+    buildHelp();
+    buildThemes();
+    scroller.focus();
+  } catch (error) {
+    console.error('Lucid: reader chrome failed to initialise', error);
+  }
   vscode.postMessage({ type: 'ready' });
 })();

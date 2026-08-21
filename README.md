@@ -59,6 +59,7 @@ the same list.
 | `{` / `}` | Tighter / looser line height |
 | `y` | Cycle font preset |
 | `t` | Cycle theme |
+| `T` | Open the theme picker |
 
 **Read**
 
@@ -102,9 +103,25 @@ have Atkinson Hyperlegible or OpenDyslexic on your system. Use `custom` plus
 `lucid.typography.customFontFamily` for anything else.
 
 **`lucid.theme.name`** (default `auto`)
-`auto` follows your VS Code theme. The rest are independent of it, which is the
-point: a dark IDE and a sepia reading pane is a perfectly reasonable setup.
-`dim` is the gentlest dark option for long sessions, `black` is for OLED panels.
+`auto` follows your VS Code theme. The other seventeen are independent of it,
+which is the point: a dark IDE and a sepia reading pane is a perfectly
+reasonable setup.
+
+Light: `paper` (warm off-white), `sepia`, `parchment` (duller and greyer than
+sepia, olive accent), `dawn` (rose-tinted, violet text), `sage` (green-tinted,
+the calmest), `mist` (cool blue-grey daylight), `newsprint` (near-black ink on
+warm grey, red accent), `gray`, `contrast` (maximum contrast, thicker rules).
+
+Dark: `dim` (the gentlest for long sessions), `dark`, `midnight` (deep navy),
+`ocean` (dark teal), `forest` (deep green, low blue content), `ember` (warm
+brown, amber accent, the least blue of the dark set), `plum` (deep purple),
+`black` (for OLED panels).
+
+Press `T` in the reader for a grid of all of them. Arrow keys preview each one
+on the document behind the picker, `Enter` keeps the one you are looking at, and
+`Esc` puts back the one you started with. `t` still cycles the list one step at
+a time, and the list runs light to dark so a cycle walks a family before it
+jumps.
 
 **`lucid.reading.focusMode`** (default `off`)
 Dims everything except what you are reading. `paragraph` is the usual choice.
@@ -124,7 +141,7 @@ hyphenation, a heading scale multiplier, heading balancing, widow prevention,
 hanging punctuation, smart quotes, smart dashes, numeral style (lining,
 oldstyle, or tabular), and drop caps.
 
-**Theme**: nine schemes, a `customColors` object that overrides any subset of
+**Theme**: eighteen schemes, a `customColors` object that overrides any subset of
 them (`background`, `surface`, `text`, `heading`, `muted`, `accent`, `rule`,
 `codeBackground`, `highlight`), a text contrast softener, four link styles including one that removes link
 styling entirely, heading colour source, and three code block treatments.

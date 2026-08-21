@@ -43,15 +43,32 @@ export const FONT_PRESETS = [
   'custom',
 ] as const;
 
+/**
+ * Reading palettes, ordered light to dark so that cycling with `t` walks a
+ * family before it jumps. `auto` leads and `custom` trails because neither is
+ * a palette of its own. Adding one here means adding it in three more places:
+ * the `lucid.theme.name` enum in package.json, a palette block in
+ * media/reader.css, and the `THEMES` list in media/reader.js.
+ */
 export const THEMES = [
   'auto',
   'paper',
   'sepia',
+  'parchment',
+  'dawn',
+  'sage',
+  'mist',
+  'newsprint',
   'gray',
+  'contrast',
   'dim',
   'dark',
+  'midnight',
+  'ocean',
+  'forest',
+  'ember',
+  'plum',
   'black',
-  'contrast',
   'custom',
 ] as const;
 
