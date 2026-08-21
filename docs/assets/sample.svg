@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="180" viewBox="0 0 640 180" role="img" aria-label="Lucid Reader sample image">
+  <rect width="640" height="180" fill="#f2f0ea"/>
+  <rect x="0" y="0" width="10" height="180" fill="#8a4b2a"/>
+  <text x="44" y="78" font-family="Georgia, serif" font-size="34" fill="#1f2024">Lucid Reader</text>
+  <text x="44" y="118" font-family="Georgia, serif" font-size="19" fill="#5e5f67">a local image, resolved relative to this document</text>
+</svg>

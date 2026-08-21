@@ -6,3 +6,4 @@ tsconfig.json
 bun.lock
 **/*.map
 .gitignore
+docs/**

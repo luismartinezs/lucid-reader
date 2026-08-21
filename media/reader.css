@@ -553,7 +553,15 @@ code.inline {
   border-radius: 0.28em;
   letter-spacing: 0;
   word-spacing: 0;
-  white-space: nowrap;
+  /* Wrap rather than run off the column: `break-spaces` keeps runs of spaces
+     inside the span intact while still allowing a break, `anywhere` lets a
+     single long token (a path, a hash) break mid-word, and `clone` repaints
+     the background and padding on every line fragment instead of only the
+     first and last. */
+  white-space: break-spaces;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 figure.code {
