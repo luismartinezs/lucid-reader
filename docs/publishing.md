@@ -164,14 +164,32 @@ The product points at the key `products/lucid-reader/lucid-reader-latest.vsix`.
 The name has no version in it on purpose: overwrite the same object on every
 release and you never have to change code or redeploy to ship a new build.
 
+Run this from the shop repository, not from the extension one, because the R2
+credentials live in `apps/backend/.env` there:
+
 ```bash
+cd ~/dev/shop-appforgelabs-v2
+set -a; source apps/backend/.env; set +a
+
+export AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID"
+export AWS_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY"
+export AWS_DEFAULT_REGION=auto
+
 aws s3 cp ~/dev/lucid-reader/lucid-reader.vsix \
-  s3://$R2_BUCKET_NAME/products/lucid-reader/lucid-reader-latest.vsix \
-  --endpoint-url https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com
+  "s3://$R2_BUCKET_NAME/products/lucid-reader/lucid-reader-latest.vsix" \
+  --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
 ```
 
-The Cloudflare dashboard upload does the same job. Afterwards, verify both the
-file and the price with the health check that already exists:
+Three things there are easy to miss. `set -a` makes every variable the file
+defines an exported one, which is what puts `$R2_BUCKET_NAME` and
+`$R2_ACCOUNT_ID` in the environment the `aws` call reads. The AWS CLI only
+looks at `AWS_*` names, so the R2 key pair has to be re-exported under them.
+And `auto` is the only region R2 accepts; the CLI refuses to sign a request
+without one.
+
+The Cloudflare dashboard upload does the same job. Afterwards, still in the
+shop repository, verify both the file and the price with the health check that
+already exists:
 
 ```bash
 bun run check:products
