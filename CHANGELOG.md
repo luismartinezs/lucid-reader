@@ -1,6 +1,16 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 - 2026-08-21
+
+- First Marketplace release. The manifest now carries the publisher, icon,
+  repository, issue tracker, and gallery banner that the listing page needs.
+- Fixed: `lucid.typography.smartQuotes` never curled double quotes. The
+  substitution ran after HTML escaping, so it looked for `"` in text where
+  every double quote had already become `&quot;`. Apostrophes and ellipses were
+  unaffected, which is why the setting looked half-working rather than broken.
+- Added `bun run shots`, which renders a sample document through the real
+  parser and the real webview runtime in headless Chrome and writes the README
+  screenshots. The pictures are generated, so they cannot drift from the code.
 
 - Added ten reading palettes, bringing the total to seventeen plus `auto` and
   `custom`. Light: `parchment`, `dawn`, `sage`, `mist`, `newsprint`. Dark:

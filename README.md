@@ -10,6 +10,21 @@ document.
 Zero runtime dependencies. The Markdown parser, the renderer, and the reading
 aids are all in this repo, roughly 2,000 lines total.
 
+![The reading view in the paper theme, with the outline open](https://raw.githubusercontent.com/luismartinezs/lucid-reader/main/docs/screenshots/reading-view.png)
+
+## Install
+
+Search for **Lucid Reader** in the Extensions view (`Ctrl+Shift+X`), or run:
+
+```
+ext install appforgelabs.lucid-reader
+```
+
+The extension is free and MIT licensed. If it earns a place in your day, there
+is a pay-what-you-want download at
+[shop.appforgelabs.com](https://shop.appforgelabs.com/products/tools/lucid-reader)
+with a suggested $5.
+
 ## Opening a document
 
 | How | What happens |
@@ -234,6 +249,19 @@ media/reader.js    Reading aids, navigation, find, keyboard.
 The settings contract lives in exactly one place, `contributes.configuration` in
 `package.json`. `config.ts` reads it back with clamping so a hand-edited
 `settings.json` degrades instead of breaking the layout.
+
+## Screenshots
+
+Seventeen reading palettes, ordered light to dark. `midnight` below, and the
+kitchen sink document in `sepia`.
+
+![The reading view in the midnight theme](https://raw.githubusercontent.com/luismartinezs/lucid-reader/main/docs/screenshots/reading-view-dark.png)
+
+![The kitchen sink document in the sepia theme](https://raw.githubusercontent.com/luismartinezs/lucid-reader/main/docs/screenshots/kitchen-sink.png)
+
+Regenerate them with `bun run shots`, which renders `docs/screenshot-prose.md`
+through the real parser and the real webview runtime in headless Chrome. No
+screenshot is taken by hand, so the pictures cannot drift from the code.
 
 ## Licence
 

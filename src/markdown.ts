@@ -221,10 +221,14 @@ const inline = (src: string, ctx: Ctx): string => {
 
   // 10. Typographic polish. Safe here because code spans are already stashed.
   if (ctx.opts.smartQuotes) {
+    // Double quotes are matched as `&quot;` because this runs after
+    // escapeHtml(), which is also why the pair below has no raw `"` case: by
+    // this point a raw `"` can only come from generated markup, and all of
+    // that is stashed behind placeholders.
     s = s
       .replace(/\.\.\./g, '…')
-      .replace(/(^|[\s([{<])"/g, '$1“')
-      .replace(/"/g, '”')
+      .replace(/(^|[\s([{<])&quot;/g, '$1“')
+      .replace(/&quot;/g, '”')
       .replace(/(^|[\s([{<])'/g, '$1‘')
       .replace(/'/g, '’');
   }

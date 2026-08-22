@@ -2,14 +2,30 @@
   "name": "lucid-reader",
   "displayName": "Lucid Reader",
   "description": "A typography-first, distraction-free reading view for Markdown. Not a preview.",
-  "version": "0.1.1",
-  "publisher": "luis",
+  "version": "0.2.0",
+  "publisher": "appforgelabs",
   "license": "MIT",
+  "icon": "media/icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": ["Other", "Visualization"],
   "keywords": ["markdown", "reader", "reading", "focus", "typography", "dyslexia", "bionic", "zen"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luismartinezs/lucid-reader.git"
+  },
+  "homepage": "https://github.com/luismartinezs/lucid-reader#readme",
+  "bugs": {
+    "url": "https://github.com/luismartinezs/lucid-reader/issues"
+  },
+  "sponsor": {
+    "url": "https://shop.appforgelabs.com/products/tools/lucid-reader"
+  },
+  "galleryBanner": {
+    "color": "#1f2024",
+    "theme": "dark"
+  },
   "main": "./out/extension.js",
   "activationEvents": [],
   "capabilities": {
@@ -598,8 +614,10 @@
   "scripts": {
     "build": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "tsc -p ./ && npx --yes @vscode/vsce package --no-dependencies --allow-missing-repository --out lucid-reader.vsix",
-    "install-local": "npm run package && code --install-extension lucid-reader.vsix --force"
+    "package": "tsc -p ./ && npx --yes @vscode/vsce package --no-dependencies --out lucid-reader.vsix",
+    "install-local": "npm run package && code --install-extension lucid-reader.vsix --force",
+    "shots": "node scripts/screenshots.mjs",
+    "publish": "tsc -p ./ && npx --yes @vscode/vsce publish --no-dependencies"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",

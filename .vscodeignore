@@ -1,9 +1,12 @@
 .vscode/**
 .claude/**
+.github/**
 src/**
+scripts/**
 node_modules/**
 tsconfig.json
 bun.lock
 **/*.map
 .gitignore
+*.vsix
 docs/**

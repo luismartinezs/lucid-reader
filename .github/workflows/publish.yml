@@ -1,0 +1,36 @@
+# Publishes to the VS Code Marketplace when a version tag is pushed.
+#
+# Requires one repository secret, VSCE_PAT: an Azure DevOps Personal Access
+# Token with scope Marketplace > Manage, issued for "All accessible
+# organizations". The token expires after at most one year, and a publish that
+# fails with a 401 almost always means it expired rather than that the manifest
+# is wrong.
+#
+# Usage: npm version minor && git push --follow-tags
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dev dependencies
+        run: npm install --no-save typescript @types/vscode @types/node
+
+      - name: Compile
+        run: npx tsc -p ./
+
+      - name: Publish
+        run: npx --yes @vscode/vsce publish --no-dependencies --pat "$VSCE_PAT"
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
