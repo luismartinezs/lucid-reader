@@ -2,7 +2,7 @@
   "name": "lucid-reader",
   "displayName": "Lucid Reader",
   "description": "A typography-first, distraction-free reading view for Markdown. Not a preview.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "appforgelabs",
   "license": "MIT",
   "icon": "media/icon.png",

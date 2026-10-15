@@ -124,6 +124,15 @@ for (const shot of SHOTS) {
       '</body>',
       `<script>window.postMessage(${JSON.stringify(payload)}, '*');</script>
 </body>`,
+    )
+    // The first paint is the `:root` paper palette, and `body` fades its
+    // background and text colour over 0.25s when the real theme lands. Headless
+    // Chrome can capture mid-fade, which once shipped a midnight screenshot with
+    // a paper-coloured page. Transitions are off so the capture is the end state.
+    .replace(
+      '</head>',
+      `<style>*, *::before, *::after { transition: none !important; animation: none !important; }</style>
+</head>`,
     );
 
   const page = path.join(tmpDir, `${shot.name}.html`);

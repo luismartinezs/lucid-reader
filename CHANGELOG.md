@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 - 2026-10-15
+
+- Fixed the `midnight` screenshot on the Marketplace listing, which showed the
+  reading pane in light colours with near-invisible headings. The capture was
+  taken while the page was still fading in from the default palette; the
+  screenshot script now disables transitions, so every capture is the final
+  state. The extension itself is unchanged.
+
 ## 0.2.0 - 2026-08-21
 
 - First Marketplace release. The manifest now carries the publisher, icon,
